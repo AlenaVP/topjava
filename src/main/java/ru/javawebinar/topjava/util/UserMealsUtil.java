@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class UserMealsUtil {
     public static void main(String[] args) {
@@ -33,18 +34,11 @@ public class UserMealsUtil {
                 map.put(date, wholeCalories);
             }
         }
-        List<UserMealWithExceed> userMealWithExceeds = new ArrayList<>();
-        boolean isExceed = false;
-        for (UserMeal meal : mealList) {
-            for (Map.Entry<LocalDate, Integer> entry : map.entrySet()) {
-                if (meal.getDateTime().toLocalDate().equals(entry.getKey()) && (entry.getValue() > caloriesPerDay)) {
-                    isExceed = true;
-                }
-            }
-            if (TimeUtil.isBetween(meal.getDateTime().toLocalTime(), startTime, endTime)) {
-                userMealWithExceeds.add(new UserMealWithExceed(meal.getDateTime(), meal.getDescription(), meal.getCalories(), isExceed));
-            }
-        }
-        return userMealWithExceeds;
+        return mealList
+                .stream()
+                .filter(userMeal -> TimeUtil.isBetween(userMeal.getDateTime().toLocalTime(), startTime, endTime))
+                .map(userMeal -> new UserMealWithExceed(userMeal.getDateTime(), userMeal.getDescription(), userMeal.getCalories(),
+                        map.get(userMeal.getDateTime().toLocalDate()) > caloriesPerDay))
+                .collect(Collectors.toList());
     }
 }
