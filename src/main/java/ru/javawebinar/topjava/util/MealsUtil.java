@@ -1,6 +1,9 @@
 package ru.javawebinar.topjava.util;
 
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.repository.inmemory.InMemoryMealRepositoryImpl;
 import ru.javawebinar.topjava.to.MealTo;
 
 import java.time.LocalDate;
@@ -27,6 +30,25 @@ public class MealsUtil {
     );
 
     public static final int DEFAULT_CALORIES_PER_DAY = 2000;
+
+    public static void main(String[] args) {
+        try (ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml")) {
+            System.out.println("Bean definition names: " + Arrays.toString(appCtx.getBeanDefinitionNames()));
+            InMemoryMealRepositoryImpl repository = appCtx.getBean(InMemoryMealRepositoryImpl.class);
+            repository.save(new Meal(LocalDateTime.now(),"firstMeal", 170));
+            repository.getAll().forEach(System.out::println);
+            System.out.println();
+            /*repository.getByUserId(2).forEach(System.out::println);
+            System.out.println();
+            Meal meal = new Meal(repository.get(7).getId(), repository.get(7).getDateTime(), "changedFirstMael", 260);
+            repository.save(meal);
+            repository.getByUserId(0).forEach(System.out::println);
+            System.out.println();
+            repository.delete(7);
+            repository.getAll().forEach(System.out::println);*/
+            System.out.println(repository.getByUserId(3));
+        }
+    }
 
     public static List<MealTo> getWithExcess(Collection<Meal> meals, int caloriesPerDay) {
         return getFilteredWithExcess(meals, caloriesPerDay, meal -> true);
