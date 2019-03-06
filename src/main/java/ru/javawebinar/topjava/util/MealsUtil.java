@@ -5,6 +5,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.inmemory.InMemoryMealRepositoryImpl;
 import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.exception.NotFoundException;
+import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,14 +40,18 @@ public class MealsUtil {
             repository.save(new Meal(LocalDateTime.now(),"firstMeal", 170));
             repository.getAll().forEach(System.out::println);
             System.out.println();
-            /*repository.getByUserId(2).forEach(System.out::println);
-            System.out.println();
-            Meal meal = new Meal(repository.get(7).getId(), repository.get(7).getDateTime(), "changedFirstMael", 260);
-            repository.save(meal);
-            repository.getByUserId(0).forEach(System.out::println);
-            System.out.println();
+            repository.getByUserId(2).forEach(System.out::println);
+            System.out.println("\nmeal updating:");
+            Meal meal = new Meal(repository.get(7).getId(), repository.get(7).getDateTime(), "changedFirstMael", 260, 3);
+            try {
+                repository.save(meal);
+            } catch (NotFoundException e) {
+                System.err.println(e.getMessage());
+            }
+            repository.getByUserId(SecurityUtil.authUserId()).forEach(System.out::println);
+            System.out.println("\nmeal deleting:");
             repository.delete(7);
-            repository.getAll().forEach(System.out::println);*/
+            repository.getAll().forEach(System.out::println);
             System.out.println(repository.getByUserId(3));
         }
     }
