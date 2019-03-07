@@ -45,8 +45,11 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
 
     @Override
     public Meal get(int id) {
+        if (!repository.keySet().contains(id)) {
+            throw new NotFoundException("false meal id (" + id + ")");
+        }
         Meal meal = repository.get(id);
-        if (SecurityUtil.authUserId() != meal.getUserId()) {
+        if (meal != null && SecurityUtil.authUserId() != meal.getUserId()) {
             throw new NotFoundException("alien id");
         }
         return meal;
@@ -54,6 +57,7 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
 
     @Override
     public Collection<Meal> getByUserId(int userId) {
+        //TODO : is necessary to check an authentication
         return repository.values().stream().filter(meal -> userId == meal.getUserId()).
                 sorted(Comparator.comparing(Meal::getDateTime).reversed()).
                 collect(Collectors.toList());

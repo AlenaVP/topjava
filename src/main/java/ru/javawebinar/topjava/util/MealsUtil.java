@@ -4,6 +4,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.inmemory.InMemoryMealRepositoryImpl;
+import ru.javawebinar.topjava.service.MealService;
+import ru.javawebinar.topjava.service.MealServiceImpl;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.SecurityUtil;
@@ -36,23 +38,56 @@ public class MealsUtil {
     public static void main(String[] args) {
         try (ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml")) {
             System.out.println("Bean definition names: " + Arrays.toString(appCtx.getBeanDefinitionNames()));
-            InMemoryMealRepositoryImpl repository = appCtx.getBean(InMemoryMealRepositoryImpl.class);
-            repository.save(new Meal(LocalDateTime.now(),"firstMeal", 170));
+            /*InMemoryMealRepositoryImpl repository = appCtx.getBean(InMemoryMealRepositoryImpl.class);
+            repository.save(new Meal(LocalDateTime.now(), "firstMeal", 170));
             repository.getAll().forEach(System.out::println);
             System.out.println();
             repository.getByUserId(2).forEach(System.out::println);
             System.out.println("\nmeal updating:");
-            Meal meal = new Meal(repository.get(7).getId(), repository.get(7).getDateTime(), "changedFirstMael", 260, 3);
+            Meal meal = null;
             try {
+                meal = new Meal(repository.get(7).getId(), repository.get(7).getDateTime(), "changedFirstMeal", 260, 3);
                 repository.save(meal);
             } catch (NotFoundException e) {
-                System.err.println(e.getMessage());
+                System.err.println(e.getMessage() + " so a meal was not updated");
             }
             repository.getByUserId(SecurityUtil.authUserId()).forEach(System.out::println);
             System.out.println("\nmeal deleting:");
-            repository.delete(7);
+            try {
+                repository.delete(7);
+            } catch (NotFoundException e) {
+                System.err.println(e.getMessage() + " so a meal was not deleted");
+            }
             repository.getAll().forEach(System.out::println);
-            System.out.println(repository.getByUserId(3));
+            System.out.println(repository.getByUserId(3));*/
+            MealService repository = appCtx.getBean(MealServiceImpl.class);
+            System.out.println("\nget All:");
+            repository.getAll().forEach(System.out::println);
+            System.out.println("\nmeal creating:");
+            repository.create(new Meal(LocalDateTime.now(),"serviceMeal", 350));
+            try {
+                System.out.println(repository.get(7));
+            } catch (NotFoundException e) {
+                System.err.println(e.getMessage());
+            }
+            System.out.println("\nmeal updating:");
+            Meal meal;
+            try {
+                meal = new Meal(repository.get(7).getId(), repository.get(7).getDateTime(), "changedServiceMeal", 440, SecurityUtil.authUserId());
+                repository.update(meal);
+                System.out.println("Success!");
+            } catch (NotFoundException e) {
+                System.err.println(e.getMessage() + " so a meal was not updated");
+            }
+            repository.getByUserId(SecurityUtil.authUserId()).forEach(System.out::println);
+            System.out.println("\nmeal deleting:");
+            try {
+                repository.delete(7);
+            } catch (NotFoundException e) {
+                System.err.println(e.getMessage() + " so a meal was not deleted");
+            }
+            repository.getAll().forEach(System.out::println);
+            System.out.println("\n" + repository.getByUserId(1));
         }
     }
 
