@@ -14,6 +14,7 @@ import ru.javawebinar.topjava.web.SecurityUtil;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
@@ -26,12 +27,18 @@ public class MealRestController {
     @Autowired
     private MealService service;
 
-    public List<MealTo> getAll() {
+    public Collection<Meal> getAll() {
+        log.info("getAll");
+        log.info("service {}", service);
+        return service.getAll();
+    }
+
+    public List<MealTo> getAllTo() {
         log.info("getAll");
         return MealsUtil.getWithExcess(service.getAll(), SecurityUtil.authUserCaloriesPerDay());
     }
 
-    public List<MealTo> getAll(LocalDate startDate, LocalDate endDate) {
+    public List<MealTo> getAllTo(LocalDate startDate, LocalDate endDate) {
         log.info("getAll filtered by date");
         if (startDate == null || endDate == null) {
             return new ArrayList<>();
@@ -40,7 +47,7 @@ public class MealRestController {
                 meal -> DateTimeUtil.isBetween(meal.getDate(), startDate, endDate));
     }
 
-    public List<MealTo> getAll(LocalTime startTime, LocalTime endTime) {
+    public List<MealTo> getAllTo(LocalTime startTime, LocalTime endTime) {
         log.info("getAll filtered by time");
         if (startTime == null || endTime == null) {
             return new ArrayList<>();

@@ -34,16 +34,16 @@ public class SpringMain {
             mealRestController.create(new Meal(LocalDateTime.now(), "firstMeal", 170));
             mealRestController.create(new Meal(LocalDateTime.now(), "serviceMeal", 350));
             mealRestController.create(new Meal(LocalDateTime.now(), "controllerMeal", 260));
-            System.out.println("\ngetAll: ");
-            mealRestController.getAll().forEach(System.out::println);
+            System.out.println("\ngetAllTo: ");
+            mealRestController.getAllTo().forEach(System.out::println);
             System.out.println("\ndate: 2015 may");
             LocalDate statDate = LocalDate.parse("2015-05-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             LocalDate endDate = LocalDate.parse("2015-05-30", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            mealRestController.getAll(statDate, endDate).forEach(System.out::println);
+            mealRestController.getAllTo(statDate, endDate).forEach(System.out::println);
             System.out.println("\ntime: 5:30..15:20");
             LocalTime statTime = LocalTime.parse("05:30", DateTimeFormatter.ofPattern("HH:mm"));
             LocalTime endTime = LocalTime.parse("15:20", DateTimeFormatter.ofPattern("HH:mm"));
-            mealRestController.getAll(statTime, endTime).forEach(System.out::println);
+            mealRestController.getAllTo(statTime, endTime).forEach(System.out::println);
             System.out.println("\n");
             Meal meal = mealRestController.get(8);
             System.out.println(meal);
@@ -59,7 +59,7 @@ public class SpringMain {
             } catch (NotFoundException e) {
                 System.err.println(e.getMessage());
             }
-            mealRestController.getAll().forEach(System.out::println);
+            mealRestController.getAllTo().forEach(System.out::println);
 
         }
     }
