@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -124,11 +125,11 @@ public class MealServiceTest {
         service.update(updated, USER_ID);
     }
 
-//    @Test(expected = DataAccessException.class)
-//    public void duplicateMailCreate() throws Exception {
-//        service.create(new Meal(null, LocalDateTime.of(2015, Month.MAY, 30, 13, 00, 00),
-//                "Обед в столовке", 800), USER_ID);
-//    }
+    @Test(expected = DataAccessException.class)
+    public void duplicateDateCreate() throws Exception {
+        service.create(new Meal(LocalDateTime.of(2015, Month.MAY, 30, 13, 0, 0),
+                "Обед в столовке", 800), USER_ID);
+    }
 
     @Test
     public void create() throws SQLException {
