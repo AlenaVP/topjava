@@ -52,8 +52,20 @@ public class User extends AbstractNamedEntity {
         this.email = email;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public Date getRegistered() {
@@ -64,10 +76,6 @@ public class User extends AbstractNamedEntity {
         this.registered = registered;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
     public int getCaloriesPerDay() {
         return caloriesPerDay;
     }
@@ -76,16 +84,8 @@ public class User extends AbstractNamedEntity {
         this.caloriesPerDay = caloriesPerDay;
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
     public Set<Role> getRoles() {
         return roles;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setRoles(Collection<Role> roles) {
