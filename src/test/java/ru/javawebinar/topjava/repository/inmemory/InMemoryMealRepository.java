@@ -3,6 +3,8 @@ package ru.javawebinar.topjava.repository.inmemory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import ru.javawebinar.topjava.MealTestData;
+import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.Util;
@@ -19,15 +21,22 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Repository
-public class InMemoryMealRepositoryImpl implements MealRepository {
-    private static final Logger log = LoggerFactory.getLogger(InMemoryMealRepositoryImpl.class);
+public class InMemoryMealRepository implements MealRepository {
+    private static final Logger log = LoggerFactory.getLogger(InMemoryMealRepository.class);
 
-    // Map  userId -> (mealId-> meal)
-    private Map<Integer, InMemoryBaseRepositoryImpl<Meal>> usersMealsMap = new ConcurrentHashMap<>();
+    // Map  userId -> mealRepository
+    private final Map<Integer, InMemoryBaseRepository<Meal>> usersMealsMap = new ConcurrentHashMap<>();
+
+    {
+        InMemoryBaseRepository<Meal> userMeals = new InMemoryBaseRepository<>();
+        MealTestData.meals.forEach(meal -> userMeals.map.put(meal.getId(), meal));
+        usersMealsMap.put(UserTestData.USER_ID, userMeals);
+    }
+
 
     @Override
     public Meal save(Meal meal, int userId) {
-        InMemoryBaseRepositoryImpl<Meal> meals = usersMealsMap.computeIfAbsent(userId, uid -> new InMemoryBaseRepositoryImpl<>());
+        InMemoryBaseRepository<Meal> meals = usersMealsMap.computeIfAbsent(userId, uid -> new InMemoryBaseRepository<>());
         return meals.save(meal);
     }
 
@@ -43,28 +52,28 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
 
     @Override
     public boolean delete(int id, int userId) {
-        InMemoryBaseRepositoryImpl<Meal> meals = usersMealsMap.get(userId);
+        InMemoryBaseRepository<Meal> meals = usersMealsMap.get(userId);
         return meals != null && meals.delete(id);
     }
 
     @Override
     public Meal get(int id, int userId) {
-        InMemoryBaseRepositoryImpl<Meal> meals = usersMealsMap.get(userId);
+        InMemoryBaseRepository<Meal> meals = usersMealsMap.get(userId);
         return meals == null ? null : meals.get(id);
     }
 
     @Override
-    public List<Meal> getAll(int userId) {
-        return getAllFiltered(userId, meal -> true);
+    public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
+        return filterByPredicate(userId, meal -> Util.isBetweenHalfOpen(meal.getDateTime(), startDateTime, endDateTime));
     }
 
     @Override
-    public List<Meal> getBetween(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
-        return getAllFiltered(userId, meal -> Util.isBetween(meal.getDateTime(), startDateTime, endDateTime));
+    public List<Meal> getAll(int userId) {
+        return filterByPredicate(userId, meal -> true);
     }
 
-    private List<Meal> getAllFiltered(int userId, Predicate<Meal> filter) {
-        InMemoryBaseRepositoryImpl<Meal> meals = usersMealsMap.get(userId);
+    private List<Meal> filterByPredicate(int userId, Predicate<Meal> filter) {
+        InMemoryBaseRepository<Meal> meals = usersMealsMap.get(userId);
         return meals == null ? Collections.emptyList() :
                 meals.getCollection().stream()
                         .filter(filter)

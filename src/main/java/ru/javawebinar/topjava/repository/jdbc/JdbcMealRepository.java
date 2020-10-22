@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public class JdbcMealRepositoryImpl implements MealRepository {
+public class JdbcMealRepository implements MealRepository {
 
     private static final RowMapper<Meal> ROW_MAPPER = BeanPropertyRowMapper.newInstance(Meal.class);
 
@@ -27,7 +27,7 @@ public class JdbcMealRepositoryImpl implements MealRepository {
     private final SimpleJdbcInsert insertMeal;
 
     @Autowired
-    public JdbcMealRepositoryImpl(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public JdbcMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.insertMeal = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("meals")
                 .usingGeneratedKeyColumns("id");
@@ -52,8 +52,7 @@ public class JdbcMealRepositoryImpl implements MealRepository {
             if (namedParameterJdbcTemplate.update("" +
                             "UPDATE meals " +
                             "   SET description=:description, calories=:calories, date_time=:date_time " +
-                            " WHERE id=:id AND user_id=:user_id"
-                    , map) == 0) {
+                            " WHERE id=:id AND user_id=:user_id", map) == 0) {
                 return null;
             }
         }
@@ -79,9 +78,9 @@ public class JdbcMealRepositoryImpl implements MealRepository {
     }
 
     @Override
-    public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
+    public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
         return jdbcTemplate.query(
-                "SELECT * FROM meals WHERE user_id=?  AND date_time BETWEEN  ? AND ? ORDER BY date_time DESC",
-                ROW_MAPPER, userId, startDate, endDate);
+                "SELECT * FROM meals WHERE user_id=?  AND date_time >=  ? AND date_time < ? ORDER BY date_time DESC",
+                ROW_MAPPER, userId, startDateTime, endDateTime);
     }
 }

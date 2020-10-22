@@ -9,16 +9,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.javawebinar.topjava.UserTestData.ADMIN;
-import static ru.javawebinar.topjava.UserTestData.USER;
+import static ru.javawebinar.topjava.UserTestData.admin;
+import static ru.javawebinar.topjava.UserTestData.user;
+
 
 @Repository
-public class InMemoryUserRepositoryImpl extends InMemoryBaseRepositoryImpl<User> implements UserRepository {
+public class InMemoryUserRepository extends InMemoryBaseRepository<User> implements UserRepository {
 
     public void init() {
-        entryMap.clear();
-        entryMap.put(UserTestData.USER_ID, USER);
-        entryMap.put(UserTestData.ADMIN_ID, ADMIN);
+        map.clear();
+        map.put(UserTestData.USER_ID, user);
+        map.put(UserTestData.ADMIN_ID, admin);
     }
 
     @Override
